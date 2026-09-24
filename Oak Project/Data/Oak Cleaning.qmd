@@ -1,0 +1,47 @@
+---
+title: "Oak Data Exploration"
+author: "Lexi H"
+format: html
+editor: visual
+---
+
+## Oak Exploratory Data Analysis and Cleaning
+
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r}
+#got thid code by clicking the file on the right then import then copy code and cancel (don't acc import)
+library(readxl)
+Survival_HeightApril26Blocks7_6Clean <- read_excel("Oak Project/Data/Survival_HeightApril26Blocks7&6Clean.xlsx", 
+                                                   sheet = "Input1", skip = 1)
+#skip got rid of the first row bc it was duplicated using the shortcut, but we couldve also gotten rid of it after importing using "slice"
+View(Survival_HeightApril26Blocks7_6Clean)
+```
+
+```{r}
+#clean each shee, first view the column names
+names(Survival_HeightApril26Blocks7_6Clean)
+```
+
+```{r}
+#now change column names
+Survival_HeightApril26Blocks7_6Clean <- 
+  rename( Page_num = "Page #",
+         Date = "MM/DD/YYYY",
+          Recorder = "Name",
+         Block = "#...4",
+         = "#...5",
+         Oak_type = "NR, S, or A",
+        Treatment  = "AC, OA, NP, DT, or DL",
+        Oa_microclimate  = "TH, TI, CN",
+         Seedling_Ht_cm = "(cm)",
+          = "#...10",
+          = "#...11",
+          = "%",
+          = "#...13",
+          = "(mm)",
+          = "as written on data sheet")
+```
