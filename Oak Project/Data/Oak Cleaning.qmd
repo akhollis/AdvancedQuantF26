@@ -9,39 +9,90 @@ editor: visual
 
 ```{r}
 #install.packages("tidyverse")
+#install.packages("plyr")
 library(tidyverse)
+library(plyr)
 ```
 
 ```{r}
 #got thid code by clicking the file on the right then import then copy code and cancel (don't acc import)
-library(readxl)
-Survival_HeightApril26Blocks7_6Clean <- read_excel("Oak Project/Data/Survival_HeightApril26Blocks7&6Clean.xlsx", 
-                                                   sheet = "Input1", skip = 1)
+#library(readxl)
+#Survival_HeightApril26Blocks7_6Clean <- read_excel("Oak Project/Data/Survival_HeightApril26Blocks7&6Clean.xlsx", 
+                                                   #sheet = "Input1", skip = 1)
 #skip got rid of the first row bc it was duplicated using the shortcut, but we couldve also gotten rid of it after importing using "slice"
-View(Survival_HeightApril26Blocks7_6Clean)
+#View(Survival_HeightApril26Blocks7_6Clean)
+
+library(readxl)
+Survival_HeightFeb26Clean <- read_excel("Survival_HeightFeb26Clean.xlsx", 
+                                        sheet = "Input1", skip = 1)
+View(Survival_HeightFeb26Clean)
+library(readxl)
+Survival_HeightApril26Blocks7_6Clean <- read_excel("Survival_HeightApril26Blocks7&6Clean.xlsx", 
+                                                   sheet = "Input1", skip = 1)
+#View(Survival_HeightApril26Blocks7_6Clean)
 ```
 
 ```{r}
-#clean each shee, first view the column names
+#clean each sheet, first view the column names
 names(Survival_HeightApril26Blocks7_6Clean)
 ```
 
 ```{r}
+#instead of working with one sheet, were just gonna combine them and then clean them at once
+oak_data <- list.files(path = "~/GitHub/AdvancedQuantF26/Oak Project/Data", 
+                       pattern = "*6Clean.xlsx",
+                       full.names = TRUE) |> 
+  lapply(read_excel,
+         na = "NA", sheet = "Input1", skip = 1) |> 
+  bind_rows()
+#view(oak_data)
+```
+
+```{r}
 #now change column names
-Survival_HeightApril26Blocks7_6Clean <- 
-  rename( Page_num = "Page #",
+oak_data_new_names <- #new dataframe name
+oak_data |> 
+  dplyr::rename(Page_num = "Page #",
          Date = "MM/DD/YYYY",
-          Recorder = "Name",
-         Block = "#...4",
-         = "#...5",
+         Recorder = "Name",
+         Block_num = "#...4",
+         Tag_num = "#...5",
          Oak_type = "NR, S, or A",
-        Treatment  = "AC, OA, NP, DT, or DL",
-        Oa_microclimate  = "TH, TI, CN",
+         Treatment  = "AC, OA, NP, DT, or DL",
+         Oak_microclimate  = "TH, TI, CN",
          Seedling_Ht_cm = "(cm)",
-          = "#...10",
-          = "#...11",
-          = "%",
-          = "#...13",
-          = "(mm)",
-          = "as written on data sheet")
+         Num_total_leaves = "#...10",
+         Num_dead_leaves = "#...11",
+         Leaf_greeness = "%",
+         Num_germinated = "#...13",
+         RCD = "(mm)",
+         Notes = "as written on data sheet")
+#view(oak_data_new_names)
+```
+
+Combining data sheets
+
+```{r}
+oak_data_clean <- oak_data_new_names |> 
+  
+  separate(Tag_num, into = c("Tag_num", "Acorn_num"), sep = "A") |> 
+  #breaks up the original tag number column into tag number and acron number, seperating by A bc it will either break up the tag number and acorn number or if there is no A then that means there is not an acorn number so no need to even break it up
+  mutate(Tag_num = as.numeric(Tag_num),
+         Acorn_num = as.numeric(Acorn_num)) |>  
+#make this numeric bc it used to be a character w "A" in it
+#if column name has no space, no need for quotes, but if you're renaming/making a new one you still need quotes bc it doesn't know what that word is
+#view(oak_data_clean)
+  mutate(Leaf_greeness = as.numeric(Leaf_greeness), #we did as numeric so that all of the missing values turned into NA, mutate changes and existing columns or makes a new column
+         Dead = case_when(), #dead column is..
+         Seedling_Ht_cm == 0 ~ "Dead", #when seedling height = 0, then make it called dead (bc when they collected data they put 0 for dead plants)
+         Seedling_Ht_cm < 0 ~ "Alive") #when seedling height has height, then make it called alive
+
+```
+
+```{r}
+oak_data_clean |> 
+  select() |> 
+  distinc()
+  arrange()
+oak_data_clean |> full_join(Acorn_ID_Table) #full join looks for matching columns and then combines matching column, whereas the other methos (forgot the name) just stacks the new rows under the old ones
 ```
