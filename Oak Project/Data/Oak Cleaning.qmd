@@ -11,7 +11,6 @@ editor: visual
 #install.packages("tidyverse")
 #install.packages("plyr")
 library(tidyverse)
-library(plyr)
 ```
 
 ```{r}
@@ -39,12 +38,21 @@ names(Survival_HeightApril26Blocks7_6Clean)
 
 ```{r}
 #instead of working with one sheet, were just gonna combine them and then clean them at once
+<<<<<<< HEAD
 oak_data <- list.files(path = "~/Documents/GitHub/AdvancedQuantF26", 
+=======
+library(plyr)
+oak_data <- list.files(path = "~/GitHub/AdvancedQuantF26/Oak Project/Data", 
+>>>>>>> 6b33eee88ab728f695655dc6c434acffe1c51c00
                        pattern = "*6Clean.xlsx",
                        full.names = TRUE) |> 
   lapply(read_excel,
          na = "NA", sheet = "Input1", skip = 1) |> 
   bind_rows()
+<<<<<<< HEAD
+=======
+unloadNamespace("plyr")
+>>>>>>> 6b33eee88ab728f695655dc6c434acffe1c51c00
 view(oak_data)
 ```
 
@@ -67,7 +75,7 @@ oak_data |>
          Num_germinated = "#...13",
          RCD = "(mm)",
          Notes = "as written on data sheet")
-#view(oak_data_new_names)
+view(oak_data_new_names)
 ```
 
 Combining data sheets
@@ -95,4 +103,17 @@ oak_data_clean |>
   distinc()
   arrange()
 oak_data_clean |> full_join(Acorn_ID_Table) #full join looks for matching columns and then combines matching column, whereas the other methos (forgot the name) just stacks the new rows under the old ones
+```
+
+```{r}
+#Question: Effect of Treatment? In open areas bc these simulate areas that need to be restored. Also they won't likely have natural recruits
+#Look at how treatments affect seeding height, seedling survival(over time or at the end, drop non-germinating seedlings ), seedling greeness (for height and greeness, focus on focal treatments, analyze natural recruits seperately, look how time affects these, filter out non-germinating rows), germination rate (needs to have each tag number once, mostly interested in the last time point, could look at others during data exploration)
+#Question: Could look at the other microclimates: DT/AC/DL (down tree, drip line), look at same 4 metrics
+#Question: How do acorns compare to NR, look at same 4 metrics
+
+#Im doing OA treatment and seedling survival
+
+
+
+
 ```
