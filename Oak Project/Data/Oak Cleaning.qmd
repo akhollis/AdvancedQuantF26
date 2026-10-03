@@ -39,13 +39,13 @@ names(Survival_HeightApril26Blocks7_6Clean)
 
 ```{r}
 #instead of working with one sheet, were just gonna combine them and then clean them at once
-oak_data <- list.files(path = "~/GitHub/AdvancedQuantF26/Oak Project/Data", 
+oak_data <- list.files(path = "~/Documents/GitHub/AdvancedQuantF26", 
                        pattern = "*6Clean.xlsx",
                        full.names = TRUE) |> 
   lapply(read_excel,
          na = "NA", sheet = "Input1", skip = 1) |> 
   bind_rows()
-#view(oak_data)
+view(oak_data)
 ```
 
 ```{r}
