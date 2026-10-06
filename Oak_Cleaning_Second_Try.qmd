@@ -1,0 +1,190 @@
+---
+title: "Oak_Cleaning_Second_Try"
+format: html
+editor: visual
+---
+
+```{r}
+#Before this, set your working directory, bc my paths were not working until I set that
+library(tidyverse) #we basically always need this for data analysis, so immediately load it
+```
+
+```{r}
+#next, load in the data!
+
+#ok so to get the path to work, I just set my wd to the "Data" folder. Then I just called the xls sheet name by itself. I think it just wants the wd right where the data is? Idk.
+#repeat for the following months.
+#October (2025)
+library(readxl)
+Survival_HeightOct2025Clean <- read_excel("Survival_HeightOct2025Clean.xlsx", 
+                                          sheet = "Input1", skip = 1)
+#View(Survival_HeightOct2025Clean)
+#February (2026)
+library(readxl)
+Survival_HeightFeb26Clean <- read_excel("Survival_HeightFeb26Clean.xlsx", 
+                                        sheet = "Input1", skip = 1)
+#View(Survival_HeightFeb26Clean)
+#March
+library(readxl)
+Survival_HeightMarch26Blocks7_6Clean <- read_excel("Survival_HeightMarch26Blocks7&6Clean.xlsx", 
+                                                   sheet = "Input1", skip = 1)
+#View(Survival_HeightMarch26Blocks7_6Clean)
+#April
+library(readxl)
+Survival_HeightApril26Blocks7_6Clean <- read_excel("Survival_HeightApril26Blocks7&6Clean.xlsx", 
+                                                   sheet = "Input1", skip = 1)
+#View(Survival_HeightApril26Blocks7_6Clean)
+#May
+library(readxl)
+Survival_HeightMay26Blocks5_76Clean <- read_excel("Survival_HeightMay26Blocks5-76Clean.xlsx", 
+                                                  sheet = "Input1", skip = 1)
+#View(Survival_HeightMay26Blocks5_76Clean)
+```
+
+```{r}
+#Let's glimpse to see what columns match up
+glimpse(Survival_HeightOct2025Clean)
+glimpse(Survival_HeightFeb26Clean)
+#We sawthat oct 2025 is missing some columns (like oak microclimate, # of dead leaves, %greeness, and # germinated), but it still has the columns for my question (treatment and seedling height). Let's check if there are a bunch of NAs though.
+#we're good the df preview thing shows that treatment only has 14% NA and seedling height has 23%.
+glimpse(Survival_HeightApril26Blocks7_6Clean)
+#It's really hard to read the columns, so idk how to compare them easily in here. Excel shows that they're similar
+```
+
+```{r}
+#Combine the data next? Or should I individually rename the columns just to make sure they line up properly, bc #4, and #5 could change to a different number in another sheet I feel like.
+
+#I'm going to rename the columns for each individually, just to be thorough.
+#actually found a more streamlined approach 
+#install.packages("purrr")
+#library(purrr)
+#library(dplyr)
+#make a "column dictionary". #lets include all of the variables even though we don't need all
+#oak_dictionary <- list(
+  #page_number = c("page #")
+  #date_collected = c("MM/DD/YYYY"),
+  #recorder_name = c("Code", "Name"),
+  #block_number = c("#...4"),
+  #now I have an issue where the next variable is tag number but it is still combined with individual acorn for february - may. So I feel like I should split this up before?
+  #Should I combine the february-may data, adjust those things, then clean the oct column names and add it in?
+glimpse(Survival_HeightFeb26Clean)
+glimpse(Survival_HeightMarch26Blocks7_6Clean)
+glimpse(Survival_HeightApril26Blocks7_6Clean)
+glimpse(Survival_HeightMay26Blocks5_76Clean) 
+#opened the table of the results and stretched so it's easier to look at.
+
+#unloadNamespace("purrr") (can't be unloaded bc part of tidyverse?)
+#unloadNamespace("dplyr") same error with this one?
+```
+
+```{r}
+#now that we looked into that, combine feb-may
+#use bind_rows bc all of the columns are in the same order
+library(dplyr)
+oak_data_feb_through_may <-bind_rows(Survival_HeightFeb26Clean, Survival_HeightMarch26Blocks7_6Clean, Survival_HeightApril26Blocks7_6Clean, Survival_HeightMay26Blocks5_76Clean)
+#view(oak_data_feb_through_may)
+#it worked, but we have some NAs and missing data we need to clean up later
+#unloadNamespace("dplyr") still did not let me use this
+```
+
+```{r}
+#let's rename the feb-may columns now
+oak_feb_may_renamed <- oak_data_feb_through_may |> 
+  rename(page_num = "Page #",
+         date = "MM/DD/YYYY",
+         recorder = "Name",
+         block_num = "#...4",
+         tag_num = "#...5",
+         oak_type = "NR, S, or A",
+         treatment  = "AC, OA, NP, DT, or DL",
+         oak_microclimate  = "TH, TI, CN",
+         seedling_ht_cm = "(cm)",
+         num_total_leaves = "#...10",
+         num_dead_leaves = "#...11",
+         leaf_greeness = "%",
+         num_germinated = "#...13",
+         RCD = "(mm)",
+         notes = "as written on data sheet")
+#view(oak_feb_may_renamed)
+```
+
+```{r}
+#ok, so now we can rename some of the columns in october before we join everything. Then we can work through more cleaning.
+oak_october_renamed <- Survival_HeightOct2025Clean |> 
+  rename(page_num = "Page #",
+         date = "MM/DD/YYYY",
+         recorder = "Code",
+         block_num = "#...4",
+         tag_num = "#...5",
+         oak_type = "NR, S, or A",
+         treatment  = "AC, OA, SA, NP, or DT", #note, different treatment types (SA, DL)
+         seedling_ht_cm = "(cm)...8",
+         num_total_leaves = "#...9",
+         base_seedling_circumference_cm = "(cm)...10",
+         base_seedling_diameter_mm = "(mm)",
+         salvia_apiana_alive = "Yes, No, or Missing?",
+         notes = "as written on data sheet"
+         ) 
+#view(oak_october_renamed)
+#october_empty_rows_rem <- oak_october_renamed[rowSums(is.na(oak_october_renamed)) < ncol(oak_october_renamed), ]
+#view(october_empty_rows_rem)
+#filter_empty_rows(oak_october_renamed)
+#view(oak_october_renamed)
+#nevermind im gonna use slice once all the dataframes are joined
+```
+
+```{r}
+#now that column names are sorted for every sheet, lets join feb-may with october
+#all_oak_data <- bind_rows(oak_october_renamed, oak_feb_may_renamed)
+#recieved an error that seedling height columns are dbl and some are chr
+#turn seedling height into dbl so we can do math with it
+#glimpse(oak_october_renamed) #dbl, so thats good
+#glimpse(oak_feb_may_renamed) #chr, so we need to change some of the variable types
+#I also saw that alot of other ones don't align, so lets go through them and mutate
+#first, turn the ones that need to be character into character
+library(dplyr)
+feb__may_fix_data_type <- oak_feb_may_renamed |> 
+  mutate(across(c(page_num, date, recorder, block_num, tag_num, oak_type, treatment, oak_microclimate), as.character)) #use across to do multiple columns at once
+
+#glimpse(feb__may_fix_data_type)
+#Now turn the other columns into dbl
+feb_may_chr_and_numeric <- feb__may_fix_data_type |> 
+  mutate(across(c(seedling_ht_cm, num_total_leaves, num_dead_leaves, leaf_greeness, num_germinated, RCD), as.numeric))
+#glimpse(feb_may_chr_and_numeric)
+#some NA's introduced, or it just automatically completed missing values with NA?
+
+#now convert the ones in october
+library(dplyr)
+october_fix_data_type <- oak_october_renamed |> 
+  mutate(across(c(page_num, date, recorder, block_num, tag_num, oak_type, treatment, salvia_apiana_alive, notes), as.character))
+
+october_chr_and_numeric <- october_fix_data_type |> 
+  mutate(across(c(seedling_ht_cm, num_total_leaves, base_seedling_circumference_cm, base_seedling_diameter_mm), as.numeric))
+#glimpse(october_chr_and_numeric)
+#view(october_chr_and_numeric)
+```
+
+```{r}
+#now combine the october with the feb-may
+all_oak_data <- bind_rows(october_chr_and_numeric, feb_may_chr_and_numeric)
+#view(all_oak_data)
+#there are a bunch of empty rows for the oct data, so i am going to unload those at the start with the "skip"
+#actually you can't do that and cutting it after renaming the october rows didn't work for me so let's use slice
+all_oak_data_remove_empty <- all_oak_data |> slice(-c(148:171)) #"c" means keep only these rows, "-c" means cut these rows
+#view(all_oak_data_remove_empty) 
+#ok that worked
+```
+
+```{r}
+#after combining the dataset, split the tag number up by number and letter
+oak_seperate_tag_num <- all_oak_data_remove_empty |> 
+  separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A") |> 
+#view(oak_seperate_tag_num)
+  mutate(dead = case_when(),
+         seedling_ht_cm == 0 ~ "dead", #when seedling height = 0, then make it called dead (bc when they collected data they put 0 for dead plants)
+         seedling_ht_cm > 0 ~ "alive") #when seedling height has height, then make it called alive
+```
+
+```{r}
+#now make a column for dead plants
+```
