@@ -38,22 +38,17 @@ names(Survival_HeightApril26Blocks7_6Clean)
 
 ```{r}
 #instead of working with one sheet, were just gonna combine them and then clean them at once
-<<<<<<< HEAD
-oak_data <- list.files(path = "~/Documents/GitHub/AdvancedQuantF26", 
-=======
 library(plyr)
+#oak_data <- list.files(path = "~/Documents/GitHub/AdvancedQuantF26", 
 oak_data <- list.files(path = "~/GitHub/AdvancedQuantF26/Oak Project/Data", 
->>>>>>> 6b33eee88ab728f695655dc6c434acffe1c51c00
                        pattern = "*6Clean.xlsx",
                        full.names = TRUE) |> 
   lapply(read_excel,
          na = "NA", sheet = "Input1", skip = 1) |> 
   bind_rows()
-<<<<<<< HEAD
-=======
+
 unloadNamespace("plyr")
->>>>>>> 6b33eee88ab728f695655dc6c434acffe1c51c00
-view(oak_data)
+#view(oak_data)
 ```
 
 ```{r}
@@ -75,7 +70,7 @@ oak_data |>
          Num_germinated = "#...13",
          RCD = "(mm)",
          Notes = "as written on data sheet")
-view(oak_data_new_names)
+#view(oak_data_new_names)
 ```
 
 Combining data sheets
