@@ -166,29 +166,41 @@ october_chr_and_numeric <- october_fix_data_type |>
 
 ```{r}
 #now combine the october with the feb-may
-all_oak_data <- bind_rows(october_chr_and_numeric, feb_may_chr_and_numeric)
+#all_oak_data <- bind_rows(october_chr_and_numeric, feb_may_chr_and_numeric)
 #view(all_oak_data)
 #there are a bunch of empty rows for the oct data, so i am going to unload those at the start with the "skip"
 #actually you can't do that and cutting it after renaming the october rows didn't work for me so let's use slice
-all_oak_data_remove_empty <- all_oak_data |> slice(-c(148:171)) #"c" means keep only these rows, "-c" means cut these rows
+#all_oak_data_remove_empty <- all_oak_data |> slice(-c(148:171)) #"c" means keep only these rows, "-c" means cut these rows
 #view(all_oak_data_remove_empty) 
 #ok that worked
 ```
 
 ```{r}
 #after combining the dataset, split the tag number up by number and letter
-oak_seperate_tag_num <- all_oak_data_remove_empty |> 
-  separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A") |> 
+#oak_seperate_tag_num <- all_oak_data_remove_empty |> 
+  #separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A") |> 
 #view(oak_seperate_tag_num)
-  mutate(dead = case_when()
+  #mutate(dead = case_when()
 ```
 
 ```{r}
-#my new dataframe left out greeness? 
+#my new dataframe left out greeness, num_dead_leaves, num_germinated, rcd 
 
 #now make a column for dead plants #need survival and germination
 ```
 
 ```{r}
+#so actually, lets use full_join bc bind_rows left out column (so comment out the "all_oak_data" piece)
+full_join_oak_data <- full_join(october_chr_and_numeric, feb_may_chr_and_numeric) |>  slice(-c(148:171)) |> 
+  separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A")#now seperate the tag number into tag number and acorn number
+#view(full_join_oak_data)
+```
 
+```{r}
+#now that we fixed that, we need to seperate the dead and alive ones
+#so what equals a dead plant? -> seedling height = NA (missing plant) or = 0 (dead?), num_total_leaves = NA (missing plant), = 0 (no leaves), ?what about dead, base_seedling_circumference = 
+```
+
+```{r}
+#for analysis, clump january and february together (there are a few february dates)
 ```
