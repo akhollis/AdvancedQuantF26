@@ -180,11 +180,15 @@ all_oak_data_remove_empty <- all_oak_data |> slice(-c(148:171)) #"c" means keep 
 oak_seperate_tag_num <- all_oak_data_remove_empty |> 
   separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A") |> 
 #view(oak_seperate_tag_num)
-  mutate(dead = case_when(),
-         seedling_ht_cm == 0 ~ "dead", #when seedling height = 0, then make it called dead (bc when they collected data they put 0 for dead plants)
-         seedling_ht_cm > 0 ~ "alive") #when seedling height has height, then make it called alive
+  mutate(dead = case_when()
 ```
 
 ```{r}
-#now make a column for dead plants
+#my new dataframe left out greeness? 
+
+#now make a column for dead plants #need survival and germination
+```
+
+```{r}
+
 ```
