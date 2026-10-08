@@ -286,4 +286,35 @@ OA_oak_data |> ggplot() +
   aes(x = sample_dead, fill = oak_microclimate) +
   geom_bar() +
   labs( x = "Life Status", y = "Count", fill = "Oak Microclimate")
+#next step could be to adjust the life status into a proportion of number in each oak microclimate
+
+#also try filtering by oak type
+
+#NA some might be character
+```
+
+```{r}
+view(OA_oak_data)
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = oak_type, fill = sample_dead) +
+  geom_bar() +
+  labs( x = "Oak Type", y = "Count", fill = "Oak Life Status")
+```
+
+```{r}
+acorn_OA_data <- OA_oak_data |> filter(oak_type == "A")
+view(acorn_OA_data)
+acorn_OA_data |> ggplot() +
+  aes(x = sample_dead, fill = oak_microclimate) +
+  geom_bar() +
+  labs( x = "Life Status (Acorns)", y = "Count", fill = "Oak Microclimate")
+```
+
+```{r}
+proportion_oak_data |> mutate(case_when(
+  total_number_oak_type
+))
 ```
