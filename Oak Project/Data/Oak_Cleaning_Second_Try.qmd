@@ -193,14 +193,97 @@ october_chr_and_numeric <- october_fix_data_type |>
 #so actually, lets use full_join bc bind_rows left out column (so comment out the "all_oak_data" piece)
 full_join_oak_data <- full_join(october_chr_and_numeric, feb_may_chr_and_numeric) |>  slice(-c(148:171)) |> 
   separate(tag_num, into = c("tag_num", "acorn_num"), sep = "A")#now seperate the tag number into tag number and acorn number
-#view(full_join_oak_data)
+view(full_join_oak_data)
 ```
 
 ```{r}
 #now that we fixed that, we need to seperate the dead and alive ones
 #so what equals a dead plant? -> seedling height = NA (missing plant) or = 0 (dead?), num_total_leaves = NA (missing plant), = 0 (no leaves), ?what about dead, base_seedling_circumference = 
+#I'm going to make a survival column thats just yes or no?
+#February, march: 0 for height, # of leaves, and RCD = Dead
+#May and April: NA indicates dead
+#october: 0 for height, # of leaves, and base diameter = dead/ blank = possibly alive
+#how do we know if NA means something or if it's just missing data?
+#we know what constitues dead, so we can make a column for that (death, not surviorship but close enough)
 ```
 
 ```{r}
-#for analysis, clump january and february together (there are a few february dates)
+#make a new column for plant_dead, for May/april when NA and for oct, feb, march when the values = 0.
+
+oak_data_with_dead <- full_join_oak_data |> 
+  mutate(sample_dead =
+           case_when(date == ymd("2025-10-21") & seedling_ht_cm == 0 ~ "Dead",
+                     date == ymd("2026-02-26") & seedling_ht_cm == 0 ~ "Dead",
+                     date == ymd("2026-01-26") & seedling_ht_cm == 0 ~ "Dead", #is the 1 a typo?
+                     date == ymd("2026-03-14") & seedling_ht_cm == 0 ~ "Dead",
+                     date == ymd("2026-04-21") & seedling_ht_cm == NA ~ "Dead",
+                     date == ymd("2026-05-05") & seedling_ht_cm == NA ~ "Dead",
+                     TRUE ~ "Other")
+         )
+#view(oak_data_with_dead)
+```
+
+```{r}
+#for analysis, clump january and february together (there are a few january dates)
+```
+
+```{r}
+#Now that data seems tidy, let's make a plot for class
+
+OA_oak_data <- oak_data_with_dead |> filter(treatment == "OA") 
+
+#view(OA_oak_data)
+OA_oak_data |> ggplot() +
+  aes(x = sample_dead, y = seedling_ht_cm) +
+  geom_point()
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = date, y = sample_dead) +
+  geom_point()
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = tag_num, y = sample_dead) +
+  geom_point()
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = tag_num, y = seedling_ht_cm) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) #axis (tilt them on axis), text (tilt the text), x (x axis), hjust moves them down
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = date, y = seedling_ht_cm) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = acorn_num, y = sample_dead, color = date) +
+  geom_density() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = sample_dead, fill = date) +
+  geom_bar() +
+  labs( x = "Life Status", y = "Count")
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#make a column that is proportion dead (#dead/#total)
+#i guess we could make a germinated column with germinated being anything with height and the rest as other, but what if something is so small it doesn't have height. also it wouldn't be that useful
+```
+
+```{r}
+OA_oak_data |> ggplot() +
+  aes(x = sample_dead, fill = oak_microclimate) +
+  geom_bar() +
+  labs( x = "Life Status", y = "Count", fill = "Oak Microclimate")
 ```
