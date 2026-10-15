@@ -314,6 +314,17 @@ acorn_OA_data |> ggplot() +
 ```
 
 ```{r}
+acorn_OA_data <- OA_oak_data |> filter(oak_type == "A")
+#view(acorn_OA_data)
+acorn_OA_data |> ggplot() +
+  aes(x = date, y = sample_dead, fill = acorn_num) +
+  geom_point()
+#can we do this but instead keep tag and acorn number together and fill with that?
+```
+
+```{r}
+#try to add a column that has the proportion of dead or alive for each oak microclimate bc we don't know if all microclimate types had the same number of plants
+#make a column total number of indivudals for each microclimate, then divide the dead/alive column by the total number
 proportion_oak_data |> mutate(case_when(
   total_number_oak_type
 ))
