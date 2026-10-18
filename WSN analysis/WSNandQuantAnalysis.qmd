@@ -1,0 +1,12 @@
+---
+title: "Kelp Data Analysis For Quant and WSN"
+author: "Lexi Hollister"
+format: html
+editor: visual
+---
+
+## Running code from scratch for Quant and WSN!
+
+```{r}
+#load packages
+```
