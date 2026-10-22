@@ -335,10 +335,17 @@ proportion_oak_data |> mutate(case_when(
 #filtered for only OA
 #Seedling survival: other or dead, 
 #oak type: Acorn, Seedling, Natural Recruit(don't include)
+#i could also do individuals (not that many)
+#or look over time
 OA_oak_data |> ggplot() +
   aes(x = sample_dead) +
   geom_bar() +
-  facet_wrap("oak_type")+
-  labs( x = "Oak Type", y = "Count")
+  facet_wrap("oak_type") +
+  labs(x = "Oak Type", y = "Count")
 
+```
+
+```{r}
+#Test for normality
+shapiro.test(OA_oak_data$sample_dead)
 ```
